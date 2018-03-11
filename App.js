@@ -5,11 +5,9 @@
  */
 
 import React, { Component } from 'react';
+
 import {
-  Platform,
-  StyleSheet,
-  Text,
-  View
+  Platform, StyleSheet, Text, View, Alert, Button, Image
 } from 'react-native';
 
 const instructions = Platform.select({
@@ -21,6 +19,11 @@ const instructions = Platform.select({
 
 export default class App extends Component<{}> {
   render() {
+    const getGAuth = () => {
+      return fetch('http://localhost:3000/users/auth/google_oauth2')
+      .then((res) => {Alert.alert(res)})
+      .then((data) => {Alert.alert(data)})
+    }
     return (
       <View style={styles.container}>
         <Text style={styles.welcome}>
@@ -32,6 +35,10 @@ export default class App extends Component<{}> {
         <Text style={styles.instructions}>
           {instructions}
         </Text>
+        <Button
+          onPress={getGAuth}
+          title="Press Me"
+        />
       </View>
     );
   }
