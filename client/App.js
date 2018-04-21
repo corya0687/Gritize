@@ -1,44 +1,36 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
- */
-
 import React, { Component } from 'react';
-
 import {
   Platform, StyleSheet, Text, View, Alert, Button, Image
 } from 'react-native';
-
-const instructions = Platform.select({
-  ios: 'Press Cmd+R to reload,\n' +
-    'Cmd+D or shake for dev menu',
-  android: 'Double tap R on your keyboard to reload,\n' +
-    'Shake or press menu button for dev menu',
-});
+import {configureManager, signIn} from './components/config/googleAuth'
+import {listCalendars} from './lib/googleCalendar'
 
 export default class App extends Component<{}> {
-  render() {
-    const getGAuth = () => {
-      return fetch('http://localhost:3000/users/auth/google_oauth2')
-      .then((res) => {Alert.alert(res)})
-      .then((data) => {Alert.alert(data)})
+  constructor (props) {
+    super(props)
+    this.state = {
+      "currentUser":{},
     }
+    this.manager = configureManager();
+  };
+
+  render() {
+
+    const googleSignIn = signIn.bind(this, this.manager)
+    const googleCalendars = listCalendars.bind(null, this.manager)
+    console.log(this.state.currentUser)
     return (
       <View style={styles.container}>
         <Text style={styles.welcome}>
           Welcome to React Native!
         </Text>
         <Text style={styles.instructions}>
-          To get started, edit App.js
+          {toString(this.state.currentUser.credentials)}
         </Text>
-        <Text style={styles.instructions}>
-          {instructions}
-        </Text>
-        <Button
-          onPress={getGAuth}
-          title="Press Me"
-        />
+        { !this.state.currentUser.credentials ?
+            <Button onPress={googleSignIn} title="login"/> :
+            <Button onPress={googleCalendars} title="See Calendars"/>
+        }
       </View>
     );
   }
