@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import {
   Platform, StyleSheet, Text, View, Alert, Button, Image
 } from 'react-native';
-import {configureManager, signIn} from './components/config/googleAuth'
-import {listCalendars} from './lib/googleCalendar'
+import {signIn} from './components/config/googleAuth'
+// import {listCalendars} from './lib/googleCalendar'
 
 export default class App extends Component<{}> {
   constructor (props) {
@@ -11,13 +11,12 @@ export default class App extends Component<{}> {
     this.state = {
       "currentUser":{},
     }
-    this.manager = configureManager();
   };
 
   render() {
 
-    const googleSignIn = signIn.bind(this, this.manager)
-    const googleCalendars = listCalendars.bind(null, this.manager)
+    const googleSignIn = signIn.bind(this)
+    // const googleCalendars = listCalendars.bind(null, this.manager)
     console.log(this.state.currentUser)
     return (
       <View style={styles.container}>
@@ -25,11 +24,11 @@ export default class App extends Component<{}> {
           Welcome to React Native!
         </Text>
         <Text style={styles.instructions}>
-          {toString(this.state.currentUser.credentials)}
+          {toString(this.state.currentUser)}
         </Text>
-        { !this.state.currentUser.credentials ?
+        { !this.state.currentUser.loggedIn ?
             <Button onPress={googleSignIn} title="login"/> :
-            <Button onPress={googleCalendars} title="See Calendars"/>
+            <Text>Hello bud</Text>
         }
       </View>
     );
