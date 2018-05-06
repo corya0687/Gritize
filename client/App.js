@@ -1,34 +1,40 @@
 import React, { Component } from 'react';
 import {
-  Platform, StyleSheet, Text, View, Alert, Button, Image
+  TextInput, Platform, StyleSheet, Text, View, Alert, Button, Image
 } from 'react-native';
-import {signIn} from './components/config/googleAuth'
-// import {listCalendars} from './lib/googleCalendar'
+import {signIn} from './components/actions/api/googleAuth'
+import * as calendarClient from './components/actions/api/googleCalendar'
 
 export default class App extends Component<{}> {
   constructor (props) {
     super(props)
     this.state = {
       "currentUser":{},
+      "calendarName": null,
+      "accessToken": null
     }
-  };
+  }
 
   render() {
 
     const googleSignIn = signIn.bind(this)
+
     // const googleCalendars = listCalendars.bind(null, this.manager)
-    console.log(this.state.currentUser)
     return (
       <View style={styles.container}>
         <Text style={styles.welcome}>
-          Welcome to React Native!
+          Current User Email
+          {this.state.currentUser.email}
         </Text>
-        <Text style={styles.instructions}>
-          {toString(this.state.currentUser)}
-        </Text>
-        { !this.state.currentUser.loggedIn ?
+        { !this.state.currentUser.email ?
             <Button onPress={googleSignIn} title="login"/> :
-            <Text>Hello bud</Text>
+              <View>
+                <Text>Add Event</Text>
+                <TextInput
+                  style={{height: 40, borderColor: 'gray', borderWidth: 1}}        onChangeText={(calendarName) => this.setState({calendarName})}
+                  value={this.state.calendarName}
+                />
+              </View>
         }
       </View>
     );
