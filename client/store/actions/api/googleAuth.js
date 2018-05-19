@@ -5,7 +5,6 @@ import {BACK_END_HOST} from '../../../utils/utils'
 class GoogleAuth {
 
   static googleFetchConfig(token, method, body){
-    debugger;
     return {
       headers: {
         Accept: 'application/json',
