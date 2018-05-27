@@ -8,10 +8,10 @@ export function fetchUser() {
   return function (dispatch) {
     dispatch(fetchingUser())
     return GoogleAuth.signIn().then((response) => {
-      let action = response.id ? fetchUserSuccess : fetchUserRejected
+      let action = response.error ? fetchUserRejected : fetchUserSuccess
       dispatch(action(response))
     })
-    .catch(error => dispatch(fetchUserRejected(error)))
+    .catch(error => {throw `Error: ${error}`})
   }
 }
 
@@ -23,6 +23,6 @@ function fetchUserSuccess(payload) {
   return {type: types.FETCH_USER_SUCCESS, payload: payload}
 }
 
-function fetchUserRejected(payload){
-  return {type: types.FETCH_USER_REJECTED, payload: payload}
+function fetchUserRejected(error){
+  return {type: types.FETCH_USER_REJECTED, payload: error}
 }

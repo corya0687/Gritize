@@ -1,5 +1,12 @@
 export default function reducer(state={
-  calendar: {},
+  calendar: {
+    events: {
+      events: [],
+      updating: false,
+      updated: false,
+      error: null
+    }
+  },
   fetching: false,
   fetched: false,
   error: null,
@@ -18,6 +25,78 @@ export default function reducer(state={
         fetching: false,
         fetched: true,
         user: action.payload
+      }
+    }
+    case "FETCH_EVENTS": {
+      return {
+        ...state,
+        calendar: {
+          events: {
+            updating: true,
+            updated: false
+          }
+        }
+      }
+    }
+    case "FETCH_EVENTS_REJECTED": {
+      return {
+        ...state,
+        fetching: false,
+        calendar: {
+          events: {
+            ...events,
+            updating: false,
+            updated: false,
+            error: action.payload
+          }
+        }
+      }
+    }
+    case "FETCH_EVENTS_SUCCESS": {
+      return {
+        ...state,
+        calendar: {
+          events: {
+            updating: false,
+            updated: true,
+            events: action.payload.items
+          }
+        }
+      }
+    }
+    case "CREATE_EVENT": {
+      return {
+        ...state,
+        calendar: {
+          events: {
+            updating: true,
+            updated: false
+          }
+        }
+      }
+    }
+    case "CREATE_EVENT_REJECTED": {
+      return {
+        ...state,
+        calendar: {
+          events: {
+            updated: false,
+            updating: false,
+            error: action.payload
+          }
+        }
+      }
+    }
+    case "CREATE_EVENT_SUCCESS": {
+      return {
+        ...state,
+        calendar: {
+          events: {
+            updating: false,
+            updated: true,
+            events: action.payload
+          }
+        }
       }
     }
   }
