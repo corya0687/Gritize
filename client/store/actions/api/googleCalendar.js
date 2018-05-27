@@ -36,8 +36,9 @@ class GoogleCalendar {
     end.setHours(23,59,59,999);
     end = end.toISOString();
 
-    const query = encodeURIComponent(`timeMin=${start}&timeMax=${end}`)
-    return fetch(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events?${query}`, GoogleAuth.googleFetchConfig(token, 'GET'))
+    const query = `?timeMin=${start}&timeMax=${end}`
+
+    return fetch(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events${query}`, GoogleAuth.googleFetchConfig(token, 'GET'))
     .then(response => response.json())
     .catch(error => {throw `Error ${error}`})
   }
