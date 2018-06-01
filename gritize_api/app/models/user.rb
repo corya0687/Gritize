@@ -4,6 +4,8 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable, :validatable, :omniauthable
 
+  has_many :activities
+
   def self.from_omniauth(data)
     user = User.where(email: data['email']).first
     unless user
