@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import { TextInput, Platform, StyleSheet, Text, View,Button, FlatList, List, ListItem } from 'react-native';
+import { TextInput, Platform, StyleSheet, Text, View,Button, FlatList, List, ListItem, TouchableOpacity } from 'react-native';
 import { connect}  from "react-redux"
 import { Formik } from 'formik';
 import {fetchUser} from './store/actions/userActions'
-import {addEvent} from './store/actions/calendarActions'
+import {addEvent, deleteEvent, updateEvent} from './store/actions/calendarActions'
 import DatePicker from 'react-native-datepicker'
 import GCalEvent from './store/actions/api/googleCalEvent'
 
@@ -19,32 +19,53 @@ export default class App extends Component<{}> {
     super(props)
   }
 
-  // renderItem(data) {
-  //   let { item, index } = data;
-  //   return (
-  //     <View style={styles.itemBlock}>
-  //       <View style={styles.itemMeta}>
-  //         <Text style={styles.itemName}>{item.summary}</Text>
-  //       </View>
-  //     </View>
-  //   )
-  // }
+  renderItem(data) {
+    let { item, index } = data;
+    const calendarId = this.props.user.user.calendarId
+    const token = this.props.user.user.accessToken
+    const removeEvent = () => {this.props.dispatch(deleteEvent(token, calendarId, item.id))}
+    const editEvent = () => {this.props.dispatch(updateEvent(token, calendarId, item.id))}
+    return (
+      <View  style={styles.itemBlock}>
+        <View style={styles.itemMeta}>
+          <Text style={styles.itemName}>{item.summary}</Text>
+          <TextInput style={styles.itemLastMessage}>{item.description}</TextInput>
+        </View>
+
+        <TouchableOpacity onPress={editEvent}>
+          <Text style={styles.editEvent} >Save</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={removeEvent}>
+          <Text style={styles.deleteEvent}>X</Text>
+        </TouchableOpacity>
+
+      </View>
+    )
+  }
+
+  createEvent(token, calendarId, input) {
+    let summary = input.eventSummary
+    let calEvent = new GCalEvent(summary,`${summary} event for today`, new Date().toISOString(), new Date().toISOString(), this.props.user.user.email)
+    this.props.dispatch(addEvent(token, calendarId, calEvent))
+  }
+
+  updateEvent(token, calendarId, input) {
+    let summary = input.eventSummary
+    this.props.dispatch(updateEvent(token, calendarId, calEvent))
+  }
 
   render() {
     const googleSignIn = () => this.props.dispatch(fetchUser());
     const isLoggedIn = !!this.props.user.user.id;
-    let postEvent;
-    console.log(this.props.calendar.events.events)
+    let createEvent;
     if (isLoggedIn) {
       let token = this.props.user.user.accessToken;
       let calendarId = this.props.user.user.calendarId
-      postEvent = input => {
-        let summary = input.eventSummary
-        let calEvent = new GCalEvent(summary,`${summary} event for today`, new Date().toISOString(), new Date().toISOString(), this.props.user.user.email)
-        this.props.dispatch(addEvent(token, calendarId, calEvent))
-      }
+      createEvent = this.createEvent.bind(this,token, calendarId)
     }
     const eventCollection = this.props.calendar.events.events
+    console.log(eventCollection)
     return (
       <View style={styles.container}>
         { isLoggedIn ?
@@ -54,7 +75,7 @@ export default class App extends Component<{}> {
               onSubmit={(values, actions) => {
                 setTimeout(() => {
                   console.log(JSON.stringify(values, null, 2));
-                  postEvent(values)
+                  createEvent(values)
                   actions.setSubmitting(false);
                 }, 1000);
               }}
@@ -75,7 +96,7 @@ export default class App extends Component<{}> {
             <FlatList
               data={eventCollection}
               keyExtractor={(item, index) => item.etag}
-              renderItem={({item}) => <Text>{item.summary}</Text>}
+              renderItem={this.renderItem.bind(this)}
             />
           </View> : <Button onPress={googleSignIn} title="login"/>
         }
@@ -109,7 +130,7 @@ export default class App extends Component<{}> {
             // ></DatePicker>
             // <TextInput
             //   style={{height: 40, borderColor: 'gray', borderWidth: 1}}
-            //   onSubmitEditing={postEvent}
+            //   onSubmitEditing={createEvent}
             // />
 
 
@@ -131,8 +152,10 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   itemBlock: {
-  flexDirection: 'row',
   paddingBottom: 5,
+  paddingLeft: 5,
+  paddingRight: 20,
+  flexDirection: 'row',
   },
   itemImage: {
     width: 50,
@@ -149,5 +172,14 @@ const styles = StyleSheet.create({
   itemLastMessage: {
     fontSize: 14,
     color: "#111",
+  },
+  deleteEvent: {
+    paddingLeft: 10,
+    paddingRight: 10,
+  },
+  editEvent: {
+    paddingLeft: 10,
+    paddingRight: 10,
   }
+
 });

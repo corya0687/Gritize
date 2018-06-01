@@ -42,6 +42,26 @@ class GoogleCalendar {
     .then(response => response.json())
     .catch(error => {throw `Error ${error}`})
   }
+
+  static updateEvent(token, calendarId, eventId){
+    return fetch(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events/${eventId}`, GoogleAuth.googleFetchConfig(token, 'PATCH', {'description':'this is a test'}))
+    .then(response => response.json())
+    .catch(error => {throw `Error ${error}`})
+  }
+
+  static deleteEvent(token, calendarId, eventId){
+    return fetch(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events/${eventId}`, GoogleAuth.googleFetchConfig(token, 'DELETE'))
+    .then(response => {
+      let message;
+      if (response.ok){
+        message = {event: 'successfully deleted'}
+      } else {
+        message = {event:`${error}`}
+      }
+      return new Promise((res, rej)=> res(message))
+    })
+    .catch(error => {throw `Error ${error}`})
+  }
 }
 
 export default GoogleCalendar

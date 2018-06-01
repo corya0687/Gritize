@@ -58,6 +58,7 @@ class GoogleAuth {
                   return userData
                 }
               })
+              .catch(error => error);
           })
       })
       .catch(error => error);
@@ -77,7 +78,7 @@ class GoogleAuth {
     .catch(error => error.json() )
   }
 
-  static findOrCreateUser(method, body){
+  static findOrCreateUser(method, body) {
     return fetch(`${BACK_END_HOST}/users/find_or_create`, this.backendFetchConfig(method, body))
     .then(response => response.json())
     .catch(error => error.json())

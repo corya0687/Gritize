@@ -37,10 +37,42 @@ export function fetchEvents(accessToken, calendarId) {
         dispatch(action(response))
       })
       .catch(error => {dispatch(fetchEventsRejected(error))})
-      }
   }
+}
 
-//TODO make add event and update events, and get Events actions
+export function updateEvent(accessToken, calendarId, eventId) {
+  return function (dispatch) {
+    dispatch(updatingEvent())
+    return googleCalendar.updateEvent(accessToken, calendarId, eventId)
+      .then( response => {
+        debugger;
+        if (!response.error) {
+          dispatch(updateEventSuccess())
+          dispatch(fetchEvents(accessToken, calendarId))
+        } else {
+          dispatch(updateEventRejected(response.error))
+        }
+      })
+      .catch(error => {dispatch(fetchEventsRejected(error))})
+  }
+}
+
+export function deleteEvent(accessToken, calendarId, eventId) {
+  return function (dispatch) {
+    dispatch(deletingEvent())
+    return googleCalendar.deleteEvent(accessToken, calendarId, eventId)
+      .then( response => {
+        debugger;
+        if (response['event'] === 'successfully deleted') {
+          dispatch(deleteEventSuccess())
+          dispatch(fetchEvents(accessToken, calendarId))
+        } else {
+          dispatch(deleteEventRejected(response['event']))
+        }
+      })
+      .catch(error => {dispatch(deleteEventRejected(response[eventId]))})
+  }
+}
 
 function fetchingCalendar() {
   return {type: types.FETCH_CALENDAR}
@@ -52,6 +84,18 @@ function fetchCalendarSuccess(payload) {
 
 function fetchCalendarRejected(payload) {
   return {type: types.FETCH_CALENDAR_REJECTED, payload: payload}
+}
+
+function creatingEvent() {
+  return {type: types.CREATE_EVENT}
+}
+
+function createEventSuccess() {
+  return {type: types.CREATE_EVENT_SUCCESS}
+}
+
+function createEventRejected(error) {
+  return {type: types.CREATE_EVENT_REJECTED, payload: error}
 }
 
 function fetchingEvents() {
@@ -66,14 +110,26 @@ function fetchEventsRejected(error){
   return {type: types.FETCH_EVENTS_REJECTED, payload: error}
 }
 
-function creatingEvent() {
-  return {type: types.CREATE_EVENT}
+function updatingEvent() {
+  return {type: types.UPDATING_EVENT}
 }
 
-function createEventSuccess() {
-  return {type: types.CREATE_EVENT_SUCCESS}
+function updateEventSuccess() {
+  return {type: types.UPDATE_EVENT_SUCCESS}
 }
 
-function createEventRejected(error) {
-  return {type: types.CREATE_EVENT_REJECTED, payload: error}
+function updateEventRejected(error) {
+  return {type: types.UPDATE_EVENT_REJECTED, payload: error}
+}
+
+function deletingEvent() {
+  return {type: types.DELETE_EVENT}
+}
+
+function deleteEventSuccess() {
+  return {type: types.DELETE_EVENT_SUCCESS}
+}
+
+function deleteEventRejected(error) {
+  return {type: types.DELETE_EVENT_REJECTED, payload: error}
 }
