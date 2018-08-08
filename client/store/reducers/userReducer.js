@@ -8,10 +8,7 @@ export default function reducer(state={
   fetching: false,
   fetched: false,
   error: null,
-  accessToken: null,
-  calendarId: null,
 }, action) {
-
   switch (action.type) {
     case "FETCH_USER": {
       return {...state, fetching: true}
