@@ -1,6 +1,8 @@
 import googleCalendar from './api/googleCalendar'
 import * as types from '../../utils/constants/actionTypes'
 import {handleResponse} from './actionsHelpers'
+import Activity from './api/activity'
+import backendConfig from './api/backendConfig'
 
 export function fetchCalendar(accessToken, calendarId) {
   return function (dispatch) {
@@ -12,65 +14,66 @@ export function fetchCalendar(accessToken, calendarId) {
   }
 }
 
-export function addEvent(accessToken, calendarId, calEvent) {
+export function addActivity(accessToken, calendarId, calEvent) {
   return function (dispatch) {
-    dispatch(creatingEvent())
+    dispatch(creatingActivity())
     return googleCalendar.createCalEvent(accessToken, calendarId, calEvent)
       .then( response => {
         if (!response.error) {
-          dispatch(createEventSuccess())
-          dispatch(fetchEvents(accessToken, calendarId))
+          Activity.createActivity('POST', response).then(resp => {
+            dispatch(createActivitySuccess())
+            dispatch(fetchActivities(accessToken, calendarId))
+          })
+
         } else {
-          dispatch(createEventRejected(response.error))
+          dispatch(createActivityRejected(response.error))
         }
       })
-      .catch(error => {dispatch(fetchEventsRejected(error))})
+      .catch(error => {dispatch(fetchActivitiesRejected(error))})
   }
 }
 
-export function fetchEvents(accessToken, calendarId) {
+export function fetchActivities(accessToken, calendarId) {
   return function (dispatch) {
-    dispatch(fetchingEvents())
+    dispatch(fetchingActivities())
     return googleCalendar.getTodaysEvents(accessToken, calendarId)
       .then(response => {
-        let action = response.error ? fetchEventsRejected : fetchEventsSuccess
+        let action = response.error ? fetchActivitiesRejected : fetchActivitiesSuccess
         dispatch(action(response))
       })
-      .catch(error => {dispatch(fetchEventsRejected(error))})
+      .catch(error => {dispatch(fetchActivitiesRejected(error))})
   }
 }
 
-export function updateEvent(accessToken, calendarId, eventId) {
+export function updateActivity(accessToken, calendarId, eventId) {
   return function (dispatch) {
-    dispatch(updatingEvent())
-    return googleCalendar.updateEvent(accessToken, calendarId, eventId)
+    dispatch(updatingActivity())
+    return googleCalendar.updateActivity(accessToken, calendarId, eventId)
       .then( response => {
-        debugger;
         if (!response.error) {
-          dispatch(updateEventSuccess())
-          dispatch(fetchEvents(accessToken, calendarId))
+          dispatch(updateActivitySuccess())
+          dispatch(fetchActivities(accessToken, calendarId))
         } else {
-          dispatch(updateEventRejected(response.error))
+          dispatch(updateActivityRejected(response.error))
         }
       })
-      .catch(error => {dispatch(fetchEventsRejected(error))})
+      .catch(error => {dispatch(fetchActivitiesRejected(error))})
   }
 }
 
-export function deleteEvent(accessToken, calendarId, eventId) {
+export function deleteActivity(accessToken, calendarId, eventId) {
   return function (dispatch) {
-    dispatch(deletingEvent())
-    return googleCalendar.deleteEvent(accessToken, calendarId, eventId)
+    dispatch(deletinActivity())
+    return googleCalendar.deleteActivity(accessToken, calendarId, eventId)
       .then( response => {
-        debugger;
         if (response['event'] === 'successfully deleted') {
-          dispatch(deleteEventSuccess())
-          dispatch(fetchEvents(accessToken, calendarId))
+          dispatch(deleteActivitySuccess())
+          dispatch(fetchActivities(accessToken, calendarId))
         } else {
-          dispatch(deleteEventRejected(response['event']))
+          dispatch(deleteActivityRejected(response['event']))
         }
       })
-      .catch(error => {dispatch(deleteEventRejected(response[eventId]))})
+      .catch(error => {dispatch(deleteActivityRejected(response[eventId]))})
   }
 }
 
@@ -86,50 +89,50 @@ function fetchCalendarRejected(payload) {
   return {type: types.FETCH_CALENDAR_REJECTED, payload: payload}
 }
 
-function creatingEvent() {
-  return {type: types.CREATE_EVENT}
+function creatingActivity() {
+  return {type: types.CREATE_ACTIVITY}
 }
 
-function createEventSuccess() {
-  return {type: types.CREATE_EVENT_SUCCESS}
+function createActivitySuccess() {
+  return {type: types.CREATE_ACTIVITY_SUCCESS}
 }
 
-function createEventRejected(error) {
-  return {type: types.CREATE_EVENT_REJECTED, payload: error}
+function createActivityRejected(error) {
+  return {type: types.CREATE_ACTIVITY_REJECTED, payload: error}
 }
 
-function fetchingEvents() {
-  return {type: types.FETCH_EVENTS}
+function fetchingActivities() {
+  return {type: types.FETCH_ACTIVITIES}
 }
 
-function fetchEventsSuccess(payload) {
-  return {type: types.FETCH_EVENTS_SUCCESS, payload: payload}
+function fetchActivitiesSuccess(payload) {
+  return {type: types.FETCH_ACTIVITIES_SUCCESS, payload: payload}
 }
 
-function fetchEventsRejected(error){
-  return {type: types.FETCH_EVENTS_REJECTED, payload: error}
+function fetchActivitiesRejected(error){
+  return {type: types.FETCH_ACTIVITIES_REJECTED, payload: error}
 }
 
-function updatingEvent() {
-  return {type: types.UPDATING_EVENT}
+function updatingActivity() {
+  return {type: types.UPDATING_ACTIVITY}
 }
 
-function updateEventSuccess() {
-  return {type: types.UPDATE_EVENT_SUCCESS}
+function updateActivitySuccess() {
+  return {type: types.UPDATE_ACTIVITY_SUCCESS}
 }
 
-function updateEventRejected(error) {
-  return {type: types.UPDATE_EVENT_REJECTED, payload: error}
+function updateActivityRejected(error) {
+  return {type: types.UPDATE_ACTIVITY_REJECTED, payload: error}
 }
 
-function deletingEvent() {
-  return {type: types.DELETE_EVENT}
+function deletingActivity() {
+  return {type: types.DELETE_ACTIVITY}
 }
 
-function deleteEventSuccess() {
-  return {type: types.DELETE_EVENT_SUCCESS}
+function deleteActivitySuccess() {
+  return {type: types.DELETE_ACTIVITY_SUCCESS}
 }
 
-function deleteEventRejected(error) {
-  return {type: types.DELETE_EVENT_REJECTED, payload: error}
+function deleteActivityRejected(error) {
+  return {type: types.DELETE_ACTIVITY_REJECTED, payload: error}
 }

@@ -1,7 +1,7 @@
 export default function reducer(state={
   calendar: {
-    events: {
-      events: [],
+    activities: {
+      activities: [],
       updating: false,
       updated: false,
       error: null
@@ -27,24 +27,24 @@ export default function reducer(state={
         user: action.payload
       }
     }
-    case "FETCH_EVENTS": {
+    case "FETCH_ACTIVITES": {
       return {
         ...state,
         calendar: {
-          events: {
+          activities: {
             updating: true,
             updated: false
           }
         }
       }
     }
-    case "FETCH_EVENTS_REJECTED": {
+    case "FETCH_ACTIVITES_REJECTED": {
       return {
         ...state,
         fetching: false,
         calendar: {
-          events: {
-            ...events,
+          activities: {
+            ...activities,
             updating: false,
             updated: false,
             error: action.payload
@@ -52,34 +52,34 @@ export default function reducer(state={
         }
       }
     }
-    case "FETCH_EVENTS_SUCCESS": {
+    case "FETCH_ACTIVITIES_SUCCESS": {
       return {
         ...state,
         calendar: {
-          events: {
+          activities: {
             updating: false,
             updated: true,
-            events: action.payload.items
+            activities: action.payload.items
           }
         }
       }
     }
-    case "CREATE_EVENT": {
+    case "CREATE_ACTIVITY": {
       return {
         ...state,
         calendar: {
-          events: {
+          activities: {
             updating: true,
             updated: false
           }
         }
       }
     }
-    case "CREATE_EVENT_REJECTED": {
+    case "CREATE_ACTIVITY_REJECTED": {
       return {
         ...state,
         calendar: {
-          events: {
+          activities: {
             updated: false,
             updating: false,
             error: action.payload
@@ -87,14 +87,14 @@ export default function reducer(state={
         }
       }
     }
-    case "CREATE_EVENT_SUCCESS": {
+    case "CREATE_ACTIVITY_SUCCESS": {
       return {
         ...state,
         calendar: {
-          events: {
+          activities: {
             updating: false,
             updated: true,
-            events: action.payload
+            activities: action.payload
           }
         }
       }

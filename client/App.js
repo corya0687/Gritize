@@ -3,7 +3,7 @@ import { TextInput, Platform, StyleSheet, Text, View,Button, FlatList, List, Lis
 import { connect}  from "react-redux"
 import { Formik } from 'formik';
 import {fetchUser} from './store/actions/userActions'
-import {addEvent, deleteEvent, updateEvent} from './store/actions/calendarActions'
+import {addActivity, deleteActivity, updateActivity} from './store/actions/calendarActions'
 import DatePicker from 'react-native-datepicker'
 import GCalEvent from './store/actions/api/googleCalEvent'
 
@@ -23,48 +23,49 @@ export default class App extends Component<{}> {
     let { item, index } = data;
     const calendarId = this.props.user.user.calendarId
     const token = this.props.user.user.accessToken
-    const removeEvent = () => {this.props.dispatch(deleteEvent(token, calendarId, item.id))}
-    const editEvent = () => {this.props.dispatch(updateEvent(token, calendarId, item.id))}
+    const removeActivity = () => {this.props.dispatch(deleteActivity(token, calendarId, item.id))}
+    const editActivity = () => {this.props.dispatch(updateActivity(token, calendarId, item.id))}
     return (
-      <View  style={styles.itemBlock}>
+      <View style={styles.itemBlock}>
+
         <View style={styles.itemMeta}>
           <Text style={styles.itemName}>{item.summary}</Text>
           <TextInput style={styles.itemLastMessage}>{item.description}</TextInput>
         </View>
 
-        <TouchableOpacity onPress={editEvent}>
-          <Text style={styles.editEvent} >Save</Text>
+        <TouchableOpacity onPress={editActivity}>
+          <Text style={styles.editActivity} >Save</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={removeEvent}>
-          <Text style={styles.deleteEvent}>X</Text>
+        <TouchableOpacity onPress={removeActivity}>
+          <Text style={styles.deleteActivity}>X</Text>
         </TouchableOpacity>
 
       </View>
     )
   }
 
-  createEvent(token, calendarId, input) {
+  buildActivity(token, calendarId, input) {
     let summary = input.eventSummary
     let calEvent = new GCalEvent(summary,`${summary} event for today`, new Date().toISOString(), new Date().toISOString(), this.props.user.user.email)
-    this.props.dispatch(addEvent(token, calendarId, calEvent))
+    this.props.dispatch(addActivity(token, calendarId, calEvent))
   }
 
-  updateEvent(token, calendarId, input) {
+  updateActivity(token, calendarId, input) {
     let summary = input.eventSummary
-    this.props.dispatch(updateEvent(token, calendarId, calEvent))
+    this.props.dispatch(updateActivity(token, calendarId, calEvent))
   }
 
   render() {
     const googleSignIn = () => this.props.dispatch(fetchUser());
     const isLoggedIn = !!this.props.user.user.id;
-    let createEvent;
+    let buildActivity;
     if (isLoggedIn) {
       let token = this.props.user.user.accessToken;
-      let calendarId = this.props.user.user.calendarId
-      createEvent = this.createEvent.bind(this,token, calendarId)
+      let calendarId = this.props.user.user.calendar_id
+      buildActivity = this.buildActivity.bind(this,token, calendarId)
     }
-    const eventCollection = this.props.calendar.events.events
+    const eventCollection = this.props.calendar.activities.activities
     console.log(eventCollection)
     return (
       <View style={styles.container}>
@@ -75,11 +76,12 @@ export default class App extends Component<{}> {
               onSubmit={(values, actions) => {
                 setTimeout(() => {
                   console.log(JSON.stringify(values, null, 2));
-                  createEvent(values)
+                  buildActivity(values)
                   actions.setSubmitting(false);
                 }, 1000);
               }}
-              render={props => (
+              render={props => {
+                return (
                 <View>
                   <TextInput
                     onChangeText={text => props.setFieldValue('eventSummary', text)}
@@ -88,6 +90,7 @@ export default class App extends Component<{}> {
                   <Button title="submit" onPress={props.handleSubmit} />
                 </View>
               )}
+            }
             />
             <Text style={styles.welcome}>
               Current User Email
@@ -104,34 +107,34 @@ export default class App extends Component<{}> {
     );
   }
 }
-            // <DatePicker
-            //   style={{width: 100}}
-            //   date=''
-            //   mode="date"
-            //   placeholder="select date"
-            //   format="YYYY-MM-DD"
-            //   minDate="2016-05-01"
-            //   maxDate="2016-06-01"
-            //   confirmBtnText="Confirm"
-            //   cancelBtnText="Cancel"
-            //   customStyles={{
-            //     dateIcon: {
-            //       position: 'absolute',
-            //       left: 0,
-            //       top: 4,
-            //       marginLeft: 0
-            //     },
-            //     dateInput: {
-            //       marginLeft: 36
-            //     }
-            //     // ... You can check the source to find the other keys.
-            //   }}
-            //   onDateChange={(date) => {this.setState({date: date})}}
-            // ></DatePicker>
-            // <TextInput
-            //   style={{height: 40, borderColor: 'gray', borderWidth: 1}}
-            //   onSubmitEditing={createEvent}
-            // />
+
+// <DatePicker
+//   style={{width: 100}}
+//   date=''
+//   mode="date"
+//   placeholder="select date"
+//   format="YYYY-MM-DD"
+//   minDate="2016-05-01"
+//   maxDate="2016-06-01"
+//   confirmBtnText="Confirm"
+//   cancelBtnText="Cancel"
+//   customStyles={{
+//     dateIcon: {
+//       position: 'absolute',
+//       left: 0,
+//       top: 4,
+//       marginLeft: 0
+//     },
+//     dateInput: {
+//       marginLeft: 36
+//     }
+//     // ... You can check the source to find the other keys.
+//   }}
+//   onDateChange={(date) => {this.setState({date: date})}}
+// ></DatePicker><TextInput
+//   style={{height: 40, borderColor: 'gray', borderWidth: 1}}
+//   onSubmitEditing={buildActivity}
+// />
 
 
 const styles = StyleSheet.create({
@@ -173,11 +176,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#111",
   },
-  deleteEvent: {
+  deleteActivity: {
     paddingLeft: 10,
     paddingRight: 10,
   },
-  editEvent: {
+  editActivity: {
     paddingLeft: 10,
     paddingRight: 10,
   }
