@@ -1,6 +1,6 @@
 import { authorize } from 'react-native-app-auth'
 import GoogleCalendar from './googleCalendar'
-import {BACK_END_HOST} from '../../../utils/utils'
+import User from './user'
 
 class GoogleAuth {
 
@@ -10,17 +10,6 @@ class GoogleAuth {
         Accept: 'application/json',
         'Content-Type':'application/json',
         "Authorization" : `Bearer ${token}`
-      },
-      method: method,
-      body: body ? JSON.stringify(body) : undefined
-    }
-  }
-
-  static backendFetchConfig(method, body){
-    return {
-      headers: {
-        Accept: 'application/json',
-        'Content-Type':'application/json',
       },
       method: method,
       body: body ? JSON.stringify(body) : undefined
@@ -42,18 +31,19 @@ class GoogleAuth {
         const accessToken = data.accessToken
         return this.getProfileData(data)
           .then((response)=>{
-            // need to move error handling to actions and break these actions up
-            return this.findOrCreateUser('POST', this.formatProfile(response))
+                // need to move error handling to actions and break these actions up
+            return User.findOrCreateUser('POST', this.formatProfile(response))
               .then((userDataResponse)=>{
-                const userData = userDataResponse;
+                const userData = userDataResponse
                 userData.accessToken = accessToken
-                userData.calendarId = userData.calendar_id
-                if(!userDataResponse.calendar_id) {
+                userData.calendar_id = userDataResponse.calendar_id
+                if(!userData.calendar_id) {
                   return GoogleCalendar.createCalendar(accessToken, userDataResponse.id)
                     .then((newCal)=> {
-                      userDataResponse.calendarId = newCal.id
-                      return this.updateUser(userDataResponse, userDataResponse.id)})
+                      userData.calendar_id = newCal.id
+                      return User.updateUser(userData, userData.id)})
                       .then( newCalUser => newCalUser)
+                      .catch(error => error);
                 } else {
                   return userData
                 }
@@ -75,20 +65,7 @@ class GoogleAuth {
   static getProfileData(data) {
     return fetch('https://www.googleapis.com/plus/v1/people/me', this.googleFetchConfig(data.accessToken, 'GET') )
     .then(response => response.json() )
-    .catch(error => error.json() )
-  }
-
-  static findOrCreateUser(method, body) {
-    return fetch(`${BACK_END_HOST}/users/find_or_create`, this.backendFetchConfig(method, body))
-    .then(response => response.json())
-    .catch(error => error.json())
-  }
-
-  static updateUser(body, id){
-    return fetch(`${BACK_END_HOST}/users/${id}`,
-     this.backendFetchConfig('PATCH', body))
-    .then(response => response.json())
-    .catch(error => error.json())
+    .catch(error => error )
   }
 }
 
