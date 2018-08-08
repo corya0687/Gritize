@@ -8,9 +8,14 @@ class UsersController < ApplicationController
 
   def update
     @user = User.find(params[:user][:id])
-    @user.update!(user_params)
-    respond_to do |format|
-      format.json {render json: @user}
+    if @user.update(user_params)
+      respond_to do |format|
+        format.json {render json: @user}
+      end
+    else
+      respond_to do |format|
+        format.json {render json: @user.errors.full_messages}
+      end
     end
   end
 
