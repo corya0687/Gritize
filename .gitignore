@@ -51,5 +51,5 @@ buck-out/
 */fastlane/report.xml
 */fastlane/Preview.html
 */fastlane/screenshots
-config/secrets.yml
+gritize_api/config/secrets*
 TODO.md
