@@ -9,8 +9,8 @@
 	"dependencies": {
 		"babel-core": "^6.26.3",
 		"formik": "^0.11.11",
-		"react": "16.0.0",
-		"react-native": "0.55.3",
+		"react": "16.6.3",
+		"react-native": "0.58.1",
 		"react-native-app-auth": "^2.4.1",
 		"react-native-datepicker": "^1.7.2",
 		"react-native-fs": "^2.9.11",
