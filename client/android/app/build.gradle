@@ -102,7 +102,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         manifestPlaceholders = [
-          appAuthRedirectScheme: 'com.googleusercontent.apps.CLIENT_ID'
+          appAuthRedirectScheme: 'com.gritize'
         ]
         versionCode 1
         versionName "1.0"

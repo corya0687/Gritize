@@ -9,4 +9,4 @@ export const backendConfig = (method, body) => {
   }
 }
 
-export const BACKENDHOST = 'http://10.0.0.52:3000'
+export const BACKENDHOST = 'http://10.0.0.52:3000';

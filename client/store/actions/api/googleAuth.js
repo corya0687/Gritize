@@ -49,9 +49,8 @@ class GoogleAuth {
                 }
               })
               .catch(error => error);
-          })
-      })
-      .catch(error => error);
+          }).catch(error => error);
+      }).catch(error => error);
   }
 
   static formatProfile(profile){
